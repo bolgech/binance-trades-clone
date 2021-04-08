@@ -10,9 +10,10 @@ const result = dotenv.config();
     throw result.error
 }*/
 const Binance = require('node-binance-api');
+const binance = new Binance().options({});
 const sourceBinance = new Binance().options({
-    APIKEY: "wyWgDDgKpgYGizi4aF0deLHRpQtL7wwPiP8IXDDAQI42M1Y41vEEoMaLnBrysFgG",
-    APISECRET: "v95RdXi98HMfKKgjMvaxefjZzBVSSOHinjkthucsin8839dbqiXVAuTthAE6DvdO"
+    APIKEY: "cjIqPofXH9DcJK0Sf1aQPrXeiEUrUI7DkudCPIt0sbXJssXiaUdKNwBYGiEvhbsf",
+    APISECRET: "lqhUNXSZDpubvDeDR0fo9AWs3pCpN6ADf5EIAJX8XDkKlfQ4m14M4bSXcvXzJ32Y"
 });
 const targetBinance = new Binance().options({
     APIKEY: "CPiQ4QdKjOcJhoAMLLdF1FxluEMxyxaZpS7Lblstr00ZWa1wgQ6OhBG9WJdb1MaH",
@@ -73,8 +74,39 @@ REJECTED - The order has been rejected and was not processed. (This is never pus
 TRADE - Part of the order or all of the order's quantity has filled.
 EXPIRED - The order was canceled according to the order type's rules (e.g. LIMIT FOK orders with no fill, LIMIT IOC or MARKET orders that partially fill) or by the exchange, (e.g. orders canceled during liquidation, orders canceled during maintenance)
 * */
-function executionReport(data){
-    console.log(data);
+async function executionReport(data){
+    const {
+        i:orderId,
+        S:side,
+        X:order_status,
+        s:symbol,
+        p:price,
+        q:quantity,
+        o:order_type,
+        P:stop_price,
+    } = data;
+    //console.log(data);
+    if(order_status!=='NEW'){
+        return;
+    }
+    try {
+        if(side==='BUY'&&order_type==='LIMIT'){
+            await targetBinance.buy(symbol,quantity,price)
+        }
+        if(side==='BUY'&&order_type!=='LIMIT'){
+            await targetBinance.marketBuy(symbol,quantity)
+        }
+
+        if(side==='SELL'&&order_type==='LIMIT'){
+            await targetBinance.sell(symbol,quantity,price)
+        }
+        if(side==='SELL'&&order_type!=='LIMIT'){
+            await targetBinance.marketSell(symbol,quantity)
+        }
+
+    }catch (err){
+        console.log(err)
+    }
 }
 
 /*
@@ -109,18 +141,26 @@ function listStatus(data){
 function outboundAccountPosition(data){
     console.log(data);
 }
-
+function parseBalance(balance){
+    return Object.entries(balance)
+        .filter(([key,{available}])=>parseFloat(available)>0)
+        .reduce((a,[key, data])=>{a[key]=parseFloat(data.available); return a},{});
+}
 (async function main(){
    try{
-    //   let balance_source = await sourceBinance.balance();
+  //     let info = await getExchangeInfo()
+       let balance_source = await sourceBinance.balance();
+       balance_source = parseBalance(balance_source);
+      // console.log(balance_source);
   //     let balance_target = await targetBinance.balance();
-   //    console.log(balance_source);
+  //    balance_target = parseBalance(balance_target);
+
    //    console.log(balance_target);
-       targetBinance.websockets.userData(outboundAccountPosition,executionReport,(data)=>{
+       sourceBinance.websockets.userData(outboundAccountPosition,executionReport,(data)=>{
            if(!data){
                return console.log('Not subscribed!')
            }
-           console.log(`${data} was subscribed`)
+           console.log(`Was subscribed success`)
 
        },listStatus);
    }catch (err){
