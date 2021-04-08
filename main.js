@@ -89,19 +89,20 @@ async function executionReport(data){
     if(order_status!=='NEW'){
         return;
     }
+    const stopPrice = parseFloat(stop_price)>0?parseFloat(stop_price):undefined;
     try {
         if(side==='BUY'&&order_type==='LIMIT'){
-            await targetBinance.buy(symbol,quantity,price)
+            await targetBinance.buy(symbol,quantity,price,{})
         }
         if(side==='BUY'&&order_type!=='LIMIT'){
-            await targetBinance.marketBuy(symbol,quantity)
+            await targetBinance.marketBuy(symbol,quantity,{})
         }
 
         if(side==='SELL'&&order_type==='LIMIT'){
-            await targetBinance.sell(symbol,quantity,price)
+            await targetBinance.sell(symbol,quantity,price,{})
         }
         if(side==='SELL'&&order_type!=='LIMIT'){
-            await targetBinance.marketSell(symbol,quantity)
+            await targetBinance.marketSell(symbol,quantity,{})
         }
 
     }catch (err){
