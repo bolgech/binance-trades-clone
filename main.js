@@ -12,12 +12,12 @@ const result = dotenv.config();
 const Binance = require('node-binance-api');
 const binance = new Binance().options({});
 const sourceBinance = new Binance().options({
-    APIKEY: "cjIqPofXH9DcJK0Sf1aQPrXeiEUrUI7DkudCPIt0sbXJssXiaUdKNwBYGiEvhbsf",
-    APISECRET: "lqhUNXSZDpubvDeDR0fo9AWs3pCpN6ADf5EIAJX8XDkKlfQ4m14M4bSXcvXzJ32Y"
+    APIKEY: "cjIqPofXH9DcJK0Sf1aQPrXeiEUrUI7",
+    APISECRET: "*************************"
 });
 const targetBinance = new Binance().options({
-    APIKEY: "CPiQ4QdKjOcJhoAMLLdF1FxluEMxyxaZpS7Lblstr00ZWa1wgQ6OhBG9WJdb1MaH",
-    APISECRET: "9Fk95moCSSIC3i43MHnSOthXU3gza4FGJpsE3neOD4b6AULbB3kHABtjb6R7o6VN"
+    APIKEY: "CPiQ4QdKjOcJhoAMLLdF1FxluEMxyxaZpS7Lb",
+    APISECRET: "****************************"
 });
 
 async function getExchangeInfo(){
